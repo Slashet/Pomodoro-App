@@ -1,20 +1,46 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MainApp());
-}
+// color implementation
+import 'package:pomodoro_app/Theme/colors.dart';
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+// screen implementation
+import 'package:pomodoro_app/presentation/home_screen/home_screen.dart';
+import 'package:pomodoro_app/presentation/profile_screen/profile_screen.dart';
 
+void main() => runApp(PomodoroApp());
+
+class PomodoroApp extends StatelessWidget {
+  const PomodoroApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Pomodoro App',
+      theme: ThemeData(primarySwatch: AppColors.appTheme),
+      initialRoute: '/',
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case '/':
+            return _createRoute(HomeScreen(), settings);
+          case '/profile':
+            return _createRoute(ProfileScreen(), settings);
+          default:
+            return null;
+        }
+      },
+    );
+  }
+
+  /// 🔸 Fade transition ile route oluşturma
+  PageRouteBuilder _createRoute(Widget page, RouteSettings settings) {
+    return PageRouteBuilder(
+      settings: settings,
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        final opacity = Tween(begin: 0.0, end: 1.0).animate(animation);
+        return FadeTransition(opacity: opacity, child: child);
+      },
+      transitionDuration: const Duration(milliseconds: 500),
     );
   }
 }
