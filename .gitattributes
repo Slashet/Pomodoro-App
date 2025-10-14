@@ -1,0 +1,22 @@
+# --- Flutter / Dart için güvenli satır sonu ayarları ---
+
+# Tüm metin dosyalarında satır sonlarını normalize et
+* text=auto eol=lf
+
+# Binary (ikili) dosyaları etkileme
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+
+# Platforma özel dosyalar
+*.bat text eol=crlf
+*.sh text eol=lf
+
+# Dart / Flutter dosyaları (her zaman LF)
+*.dart text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
