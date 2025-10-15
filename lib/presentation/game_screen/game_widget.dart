@@ -14,16 +14,18 @@ class ChallangeWidget extends StatefulWidget {
 class _ChallangeWidgetState extends State<ChallangeWidget> {
   int _health = 0;
   int _damage = 0;
-
   Color enemyColor = Colors.red;
 
-  int calculateHealth() {
-    return (10 + (levelCounter.value * levelCounter.value / 3)).toInt();
-  }
+  bool _canAttack = true;
+  final int _attackCooldownMs = 200;
 
-  int calculateDamage() {
-    return (1 + (expCounter.value / 2)).toInt();
-  }
+  final ValueNotifier<int> healthNotifier = ValueNotifier<int>(0);
+  final ValueNotifier<int> damageNotifier = ValueNotifier<int>(0);
+  final ValueNotifier<Color> colorNotifier = ValueNotifier<Color>(Colors.red);
+
+  int calculateHealth() =>
+      (10 + (levelCounter.value * levelCounter.value / 3)).toInt();
+  int calculateDamage() => (1 + (expCounter.value / 2)).toInt();
 
   Color getRandomColor() {
     final random = Random();
@@ -36,38 +38,45 @@ class _ChallangeWidgetState extends State<ChallangeWidget> {
   }
 
   void _attack() {
-    setState(() {
-      _health -= _damage;
-      if (_health <= 0) {
-        _health = 0;
-        updateCounter("level_counter", levelCounter.value + 1).catchError((e) {
-          debugPrint("updateCounter hatası: $e");
-        });
-        _health = calculateHealth();
-        _damage = calculateDamage();
-        enemyColor = getRandomColor();
-      }
+    if (!_canAttack) return;
+    _canAttack = false;
+
+    _health -= _damage;
+    if (_health <= 0) {
+      _health = 0;
+      updateCounter("level_counter", levelCounter.value + 1).catchError((e) {
+        debugPrint("updateCounter hatası: $e");
+      });
+      _health = calculateHealth();
+      _damage = calculateDamage();
+      enemyColor = getRandomColor();
+      colorNotifier.value = enemyColor;
+    }
+
+    healthNotifier.value = _health;
+    damageNotifier.value = _damage;
+
+    Future.delayed(Duration(milliseconds: _attackCooldownMs), () {
+      _canAttack = true;
     });
   }
 
   @override
   void initState() {
     super.initState();
-
     initData();
 
     levelCounter.addListener(() {
-      setState(() {
-        _health = calculateHealth();
-        _damage = calculateDamage();
-        if (_health < 0) _health = 0;
-      });
+      _health = calculateHealth();
+      healthNotifier.value = _health;
+
+      _damage = calculateDamage();
+      damageNotifier.value = _damage;
     });
 
     expCounter.addListener(() {
-      setState(() {
-        _damage = calculateDamage();
-      });
+      _damage = calculateDamage();
+      damageNotifier.value = _damage;
     });
   }
 
@@ -75,52 +84,67 @@ class _ChallangeWidgetState extends State<ChallangeWidget> {
     try {
       await loadLevelCounter();
       await loadExpCounter();
+      _damage = calculateDamage();
+      _health = calculateHealth();
+      enemyColor = getRandomColor();
 
-      setState(() {
-        _damage = calculateDamage();
-        _health = calculateHealth();
-        enemyColor = getRandomColor();
-      });
+      healthNotifier.value = _health;
+      damageNotifier.value = _damage;
+      colorNotifier.value = enemyColor;
     } catch (e, st) {
       debugPrint("game_widget.dart => initData() => Error: $e\n$st");
-      setState(() {
-        _damage = 1;
-        _health = 10;
-        enemyColor = Colors.red;
-      });
+      _damage = 1;
+      _health = 10;
+      enemyColor = Colors.red;
+
+      healthNotifier.value = _health;
+      damageNotifier.value = _damage;
+      colorNotifier.value = enemyColor;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        _attack();
-        FocusScope.of(context).unfocus();
-      },
+      onTap: _attack,
       child: Container(
         color: Colors.transparent,
         width: double.infinity,
         height: double.infinity,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: 250 * (_health / calculateHealth()),
-                height: 25,
-                color: Colors.red.shade300,
-                child: Center(child: Text("$_health/${calculateHealth()}")),
+              ValueListenableBuilder<int>(
+                valueListenable: healthNotifier,
+                builder: (_, health, __) {
+                  final maxHealth = calculateHealth();
+                  return Container(
+                    width: 250 * (health / maxHealth),
+                    height: 25,
+                    color: Colors.red.shade300,
+                    child: Center(child: Text("$health/$maxHealth")),
+                  );
+                },
               ),
-              Container(width: 250, height: 250, color: enemyColor),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Level: ${levelCounter.value}"),
-                  SizedBox(width: 30),
-                  Text("Attack: ${calculateDamage()}"),
-                ],
+              ValueListenableBuilder<Color>(
+                valueListenable: colorNotifier,
+                builder: (_, color, __) =>
+                    Container(width: 250, height: 250, color: color),
+              ),
+              ValueListenableBuilder<int>(
+                valueListenable: damageNotifier,
+                builder: (_, damage, __) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Level: ${levelCounter.value}"),
+                      SizedBox(width: 30),
+                      Text("Attack: $damage"),
+                    ],
+                  );
+                },
               ),
             ],
           ),
