@@ -1,3 +1,3 @@
 # pomodoro_app
 
-A new Flutter project.
+It's a pomodoro app. you can Fallow your time and play game trough it also you can fallow your stats.
