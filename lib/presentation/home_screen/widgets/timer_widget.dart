@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dart:math';
 
 // color implementation
 import 'package:pomodoro_app/Theme/colors.dart';
+
+// Data implementation
+import 'package:pomodoro_app/data/work_counter.dart';
 
 class TimerWidget extends StatefulWidget {
   const TimerWidget({super.key});
@@ -39,6 +43,9 @@ class _MyWidgetState extends State<TimerWidget> {
           _seconds -= 198;
         });
       } else {
+        if (!_isBreak) {
+          incrementCounter();
+        }
         _isBreak = !_isBreak;
         setState(() {
           _seconds = _isBreak ? _breakTime : _workTime;
