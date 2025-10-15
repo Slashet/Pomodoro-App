@@ -22,7 +22,7 @@ class _ChallangeWidgetState extends State<ChallangeWidget> {
   }
 
   int calculateDamage() {
-    return (1 + (expCounter.value / 10)).toInt();
+    return (1 + (expCounter.value / 2)).toInt();
   }
 
   Color getRandomColor() {
@@ -39,7 +39,10 @@ class _ChallangeWidgetState extends State<ChallangeWidget> {
     setState(() {
       _health -= _damage;
       if (_health <= 0) {
-        updateCounter("level_counter", levelCounter.value + 1);
+        _health = 0;
+        updateCounter("level_counter", levelCounter.value + 1).catchError((e) {
+          debugPrint("updateCounter hatası: $e");
+        });
         _health = calculateHealth();
         _damage = calculateDamage();
         enemyColor = getRandomColor();
@@ -53,6 +56,14 @@ class _ChallangeWidgetState extends State<ChallangeWidget> {
 
     initData();
 
+    levelCounter.addListener(() {
+      setState(() {
+        _health = calculateHealth();
+        _damage = calculateDamage();
+        if (_health < 0) _health = 0;
+      });
+    });
+
     expCounter.addListener(() {
       setState(() {
         _damage = calculateDamage();
@@ -61,14 +72,23 @@ class _ChallangeWidgetState extends State<ChallangeWidget> {
   }
 
   Future<void> initData() async {
-    await loadLevelCounter();
-    await loadExpCounter();
+    try {
+      await loadLevelCounter();
+      await loadExpCounter();
 
-    setState(() {
-      _damage = calculateDamage();
-      _health = calculateHealth();
-      enemyColor = getRandomColor();
-    });
+      setState(() {
+        _damage = calculateDamage();
+        _health = calculateHealth();
+        enemyColor = getRandomColor();
+      });
+    } catch (e, st) {
+      debugPrint("game_widget.dart => initData() => Error: $e\n$st");
+      setState(() {
+        _damage = 1;
+        _health = 10;
+        enemyColor = Colors.red;
+      });
+    }
   }
 
   @override

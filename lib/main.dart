@@ -1,18 +1,27 @@
 import 'package:flutter/material.dart';
 
-// color implementation
+// Color implementation
 import 'package:pomodoro_app/Theme/colors.dart';
 import 'package:pomodoro_app/data/data_managment.dart';
 
-// screen implementation
+// Screen implementation
 import 'package:pomodoro_app/presentation/timer_screen/timer_widget.dart';
 import 'package:pomodoro_app/presentation/stat_screen/stat_screen.dart';
 import 'package:pomodoro_app/presentation/game_screen/game_widget.dart';
+import 'package:pomodoro_app/presentation/widget/navigation_widget.dart';
 
-import 'package:pomodoro_app/presentation/widget/navigation_bar.dart';
 import 'package:pomodoro_app/presentation/widget/appbar_widget.dart';
 
-void main() => runApp(PomodoroApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Statları yüklemeden uygulamayı başlatma
+  await loadExpCounter();
+  await loadLevelCounter();
+  await loadWorkCounter();
+
+  runApp(const PomodoroApp());
+}
 
 class PomodoroApp extends StatelessWidget {
   const PomodoroApp({super.key});
@@ -22,36 +31,27 @@ class PomodoroApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Pomodoro App',
-      theme: ThemeData(primarySwatch: AppColors.appTheme),
-      home: myApp(),
+      theme: ThemeData(primarySwatch: AppColors.appTheme, useMaterial3: true),
+      home: const MyApp(),
     );
   }
 }
 
-class myApp extends StatefulWidget {
-  const myApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
 
   @override
-  State<myApp> createState() => _myAppState();
+  State<MyApp> createState() => _MyAppState();
 }
 
-class _myAppState extends State<myApp> {
+class _MyAppState extends State<MyApp> {
   int _index = 1;
-
-  @override
-  void initState() {
-    super.initState();
-
-    loadExpCounter();
-    loadLevelCounter();
-    loadWorkCounter();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: applicbar(context),
-      bottomNavigationBar: naviBar(
+      bottomNavigationBar: AppNavigation(
         currentIndex: _index,
         onTap: (index) {
           setState(() {
@@ -61,7 +61,7 @@ class _myAppState extends State<myApp> {
       ),
       body: IndexedStack(
         index: _index,
-        children: [ChallangeWidget(), TimerWidget(), StatsWidget()],
+        children: const [ChallangeWidget(), TimerWidget(), StatsWidget()],
       ),
     );
   }

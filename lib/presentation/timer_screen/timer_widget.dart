@@ -22,6 +22,8 @@ class _MyWidgetState extends State<TimerWidget> {
   final int _workTime = 1500;
   int _seconds = 1500;
 
+  int streak = 0;
+
   bool _isBreak = false;
   bool _isRun = false;
 
@@ -37,20 +39,28 @@ class _MyWidgetState extends State<TimerWidget> {
     _isRun = true;
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_seconds > 0) {
-        setState(() {
-          _seconds -= 459;
-        });
-      } else {
-        if (!_isBreak) {
-          updateCounter("work_counter", workCounter.value + 1);
-          updateCounter("exp_counter", expCounter.value + 3);
-        }
-        _isBreak = !_isBreak;
-        setState(() {
+      setState(() {
+        _seconds = max(0, _seconds - 1);
+
+        if (_seconds == 0) {
+          if (!_isBreak) {
+            streak++;
+            if (streak > streakCounter.value) {
+              updateCounter("streak_counter", streak);
+            }
+            updateCounter("work_counter", workCounter.value + 1).catchError((
+              e,
+            ) {
+              debugPrint("timer_widget.dart => updateCounter => error: $e");
+            });
+            updateCounter("exp_counter", expCounter.value + 3).catchError((e) {
+              debugPrint("timer_widget.dart => updateCounter => error: $e");
+            });
+          }
+          _isBreak = !_isBreak;
           _seconds = _isBreak ? _breakTime : _workTime;
-        });
-      }
+        }
+      });
     });
   }
 

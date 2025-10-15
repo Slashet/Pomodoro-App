@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// color implementation
+// Color implementation
 import 'package:pomodoro_app/Theme/colors.dart';
 
 // Data implementation
@@ -15,26 +15,13 @@ class StatsWidget extends StatefulWidget {
 
 class _StatsWidgetState extends State<StatsWidget> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           children: <Widget>[
-            infoCard(innerText: "Work Counter", innerDataNotifier: workCounter),
-            Divider(),
-            infoCard(
-              innerText: "Level Counter",
-              innerDataNotifier: levelCounter,
-            ),
-            Divider(),
-            infoCard(innerText: "Exp Counter", innerDataNotifier: expCounter),
-            Divider(),
+            // Reset Button
             SizedBox(
               width: double.infinity,
               child: FilledButton(
@@ -42,9 +29,16 @@ class _StatsWidgetState extends State<StatsWidget> {
                   backgroundColor: AppColors.fourth,
                 ),
                 onPressed: () async {
-                  await resetCounter("work_counter");
-                  await resetCounter("level_counter");
-                  await resetCounter("exp_counter");
+                  try {
+                    await resetCounter("work_counter");
+                    await resetCounter("level_counter");
+                    await resetCounter("exp_counter");
+                    await resetCounter(
+                      "streak_counter",
+                    ); // Eğer streakCounter varsa
+                  } catch (e, st) {
+                    debugPrint("Reset hatası: $e\n$st");
+                  }
                 },
                 child: Text(
                   "Reset",
@@ -55,6 +49,18 @@ class _StatsWidgetState extends State<StatsWidget> {
                 ),
               ),
             ),
+            const Divider(height: 24),
+            // InfoCards
+            InfoCard(innerText: "Work Counter", innerDataNotifier: workCounter),
+            const Divider(),
+            InfoCard(
+              innerText: "Level Counter",
+              innerDataNotifier: levelCounter,
+            ),
+            const Divider(),
+            InfoCard(innerText: "Exp Counter", innerDataNotifier: expCounter),
+            const Divider(),
+            InfoCard(innerText: "Streak", innerDataNotifier: streakCounter),
           ],
         ),
       ),
@@ -62,62 +68,48 @@ class _StatsWidgetState extends State<StatsWidget> {
   }
 }
 
-class infoCard extends StatefulWidget {
+class InfoCard extends StatelessWidget {
   final String innerText;
   final ValueNotifier<int> innerDataNotifier;
 
-  const infoCard({
+  const InfoCard({
     super.key,
     required this.innerText,
     required this.innerDataNotifier,
   });
 
   @override
-  State<infoCard> createState() => _infoCardState();
-}
-
-class _infoCardState extends State<infoCard> {
-  @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Card(
-        color: AppColors.third,
-        child: SizedBox.expand(
-          child: Column(
+    return Card(
+      color: AppColors.third,
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      child: SizedBox(
+        height: 100, // Sabit yükseklik
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  SizedBox(width: 20),
-                  Text(
-                    widget.innerText,
-                    style: TextStyle(
+              Text(
+                innerText,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.fourth,
+                  fontSize: 24,
+                ),
+              ),
+              ValueListenableBuilder<int>(
+                valueListenable: innerDataNotifier,
+                builder: (context, value, child) {
+                  return Text(
+                    value.toString(),
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: AppColors.fourth,
-                      fontSize: 50,
+                      fontSize: 24,
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ValueListenableBuilder(
-                    valueListenable: widget.innerDataNotifier,
-                    builder: (context, value, child) {
-                      return Text(
-                        value.toString(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.fourth,
-                          fontSize: 50,
-                        ),
-                      );
-                    },
-                  ),
-                  SizedBox(width: 20),
-                ],
+                  );
+                },
               ),
             ],
           ),

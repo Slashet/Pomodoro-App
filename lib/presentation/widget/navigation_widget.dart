@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:pomodoro_app/Theme/colors.dart';
 
-class naviBar extends StatelessWidget {
+class AppNavigation extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  const naviBar({super.key, required this.currentIndex, required this.onTap});
+  const AppNavigation({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return NavigationBar(
-      indicatorColor: AppColors.fourth,
       backgroundColor: AppColors.second,
+      indicatorColor: AppColors.fourth,
       labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
       selectedIndex: currentIndex,
       onDestinationSelected: onTap,
-      destinations: const <Widget>[
+      destinations: const <NavigationDestination>[
         NavigationDestination(
           selectedIcon: Icon(Icons.play_arrow_rounded, color: AppColors.second),
           icon: Icon(Icons.play_arrow_outlined, color: AppColors.fourth),
@@ -27,7 +31,7 @@ class naviBar extends StatelessWidget {
           label: 'Timer',
         ),
         NavigationDestination(
-          selectedIcon: (Icon(Icons.query_stats, color: AppColors.second)),
+          selectedIcon: Icon(Icons.query_stats, color: AppColors.second),
           icon: Icon(Icons.query_stats, color: AppColors.fourth),
           label: 'Stats',
         ),
