@@ -6,7 +6,7 @@ import 'dart:math';
 import 'package:pomodoro_app/Theme/colors.dart';
 
 // Data implementation
-import 'package:pomodoro_app/data/work_counter.dart';
+import 'package:pomodoro_app/data/data_managment.dart';
 
 class TimerWidget extends StatefulWidget {
   const TimerWidget({super.key});
@@ -43,7 +43,12 @@ class _MyWidgetState extends State<TimerWidget> {
         });
       } else {
         if (!_isBreak) {
-          incrementWorkCounter();
+          updateCounter("work_counter", workCounter.value + 1);
+          updateCounter("exp_counter", expCounter.value + 1);
+          updateCounter(
+            "exp_counter",
+            expCounter.value + (workCounter.value / 10).toInt(),
+          );
         }
         _isBreak = !_isBreak;
         setState(() {

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:pomodoro_app/Theme/colors.dart';
 
 // Data implementation
-import 'package:pomodoro_app/data/work_counter.dart';
+import 'package:pomodoro_app/data/data_managment.dart';
 
 class StatsWidget extends StatefulWidget {
   const StatsWidget({super.key});
@@ -73,7 +73,51 @@ class _StatsWidgetState extends State<StatsWidget> {
               ),
             ),
             Divider(),
-            Expanded(child: Card(child: SizedBox.expand())),
+            Expanded(
+              child: Card(
+                color: AppColors.third,
+                child: SizedBox.expand(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(width: 20),
+                          Text(
+                            "Level Counter",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.fourth,
+                              fontSize: 50,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ValueListenableBuilder(
+                            valueListenable: levelCounter,
+                            builder: (context, levelCounter, child) {
+                              return Text(
+                                '$levelCounter',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.fourth,
+                                  fontSize: 50,
+                                ),
+                              );
+                            },
+                          ),
+                          SizedBox(width: 20),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
             Divider(),
             SizedBox(
               width: double.infinity,
@@ -82,7 +126,8 @@ class _StatsWidgetState extends State<StatsWidget> {
                   backgroundColor: AppColors.fourth,
                 ),
                 onPressed: () async {
-                  await resetWorkCounter();
+                  await resetCounter("work_counter");
+                  await resetCounter("level_counter");
                 },
                 child: Text(
                   "Reset",
