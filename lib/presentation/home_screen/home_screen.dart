@@ -5,6 +5,10 @@ import 'package:pomodoro_app/Theme/colors.dart';
 
 // widget implementation
 import 'package:pomodoro_app/presentation/home_screen/widgets/timer_widget.dart';
+import 'package:pomodoro_app/presentation/home_screen/widgets/appbar_widget.dart';
+import 'package:pomodoro_app/presentation/home_screen/widgets/navigation_bar.dart';
+import 'package:pomodoro_app/presentation/home_screen/widgets/stats_widget.dart';
+import 'package:pomodoro_app/presentation/home_screen/widgets/challange_widget.dart';
 
 void main() => runApp(const HomeScreen());
 
@@ -13,20 +17,38 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return MyWidget();
+  }
+}
+
+class MyWidget extends StatefulWidget {
+  const MyWidget({super.key});
+
+  @override
+  State<MyWidget> createState() => _MyWidgetState();
+}
+
+class _MyWidgetState extends State<MyWidget> {
+  int _index = 1;
+
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         backgroundColor: AppColors.first,
-        appBar: AppBar(
-          actions: <Widget>[
-            IconButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/profile');
-              },
-              icon: const Icon(Icons.person_sharp),
-            ),
-          ],
+        appBar: applicbar(context),
+        body: IndexedStack(
+          index: _index,
+          children: [ChallangeWidget(), TimerWidget(), StatsWidget()],
         ),
-        body: MyWidget(),
+        bottomNavigationBar: naviBar(
+          currentIndex: _index,
+          onTap: (index) {
+            setState(() {
+              _index = index;
+            });
+          },
+        ),
       ),
       debugShowCheckedModeBanner: false,
     );

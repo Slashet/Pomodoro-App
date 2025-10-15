@@ -31,7 +31,6 @@ class PomodoroApp extends StatelessWidget {
     );
   }
 
-  /// 🔸 Fade transition ile route oluşturma
   PageRouteBuilder _createRoute(Widget page, RouteSettings settings) {
     return PageRouteBuilder(
       settings: settings,
