@@ -23,7 +23,7 @@ class PomodoroApp extends StatelessWidget {
           case '/':
             return _createRoute(HomeScreen(), settings);
           case '/profile':
-            return _createRoute(ProfileScreen(), settings);
+            return _createRoute(prof(), settings);
           default:
             return null;
         }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dart:math';
 
@@ -44,7 +43,7 @@ class _MyWidgetState extends State<TimerWidget> {
         });
       } else {
         if (!_isBreak) {
-          incrementCounter();
+          incrementWorkCounter();
         }
         _isBreak = !_isBreak;
         setState(() {

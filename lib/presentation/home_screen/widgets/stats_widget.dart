@@ -17,7 +17,7 @@ class _StatsWidgetState extends State<StatsWidget> {
   @override
   void initState() {
     super.initState();
-    loadCounter();
+    loadWorkCounter();
   }
 
   @override
@@ -29,7 +29,7 @@ class _StatsWidgetState extends State<StatsWidget> {
           children: <Widget>[
             Expanded(
               child: Card(
-                color: AppColors.second,
+                color: AppColors.third,
                 child: SizedBox.expand(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -74,6 +74,25 @@ class _StatsWidgetState extends State<StatsWidget> {
             ),
             Divider(),
             Expanded(child: Card(child: SizedBox.expand())),
+            Divider(),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.fourth,
+                ),
+                onPressed: () async {
+                  await resetWorkCounter();
+                },
+                child: Text(
+                  "Reset",
+                  style: TextStyle(
+                    color: AppColors.second,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
