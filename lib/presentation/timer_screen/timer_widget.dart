@@ -39,16 +39,12 @@ class _MyWidgetState extends State<TimerWidget> {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_seconds > 0) {
         setState(() {
-          _seconds -= 198;
+          _seconds -= 459;
         });
       } else {
         if (!_isBreak) {
           updateCounter("work_counter", workCounter.value + 1);
-          updateCounter("exp_counter", expCounter.value + 1);
-          updateCounter(
-            "exp_counter",
-            expCounter.value + (workCounter.value / 10).toInt(),
-          );
+          updateCounter("exp_counter", expCounter.value + 3);
         }
         _isBreak = !_isBreak;
         setState(() {

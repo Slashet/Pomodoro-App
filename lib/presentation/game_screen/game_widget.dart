@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-// color implementation
-import 'package:pomodoro_app/Theme/colors.dart';
-
 // Data implementation
 import 'package:pomodoro_app/data/data_managment.dart';
 
@@ -25,7 +22,7 @@ class _ChallangeWidgetState extends State<ChallangeWidget> {
   }
 
   int calculateDamage() {
-    return (1 + (expCounter.value * 3 / 2)).toInt();
+    return (1 + (expCounter.value / 10)).toInt();
   }
 
   Color getRandomColor() {
@@ -44,6 +41,7 @@ class _ChallangeWidgetState extends State<ChallangeWidget> {
       if (_health <= 0) {
         updateCounter("level_counter", levelCounter.value + 1);
         _health = calculateHealth();
+        _damage = calculateDamage();
         enemyColor = getRandomColor();
       }
     });
@@ -53,13 +51,24 @@ class _ChallangeWidgetState extends State<ChallangeWidget> {
   void initState() {
     super.initState();
 
-    loadLevelCounter();
-    loadExpCounter();
+    initData();
 
-    _damage = calculateDamage();
-    _health = calculateHealth();
+    expCounter.addListener(() {
+      setState(() {
+        _damage = calculateDamage();
+      });
+    });
+  }
 
-    enemyColor = getRandomColor();
+  Future<void> initData() async {
+    await loadLevelCounter();
+    await loadExpCounter();
+
+    setState(() {
+      _damage = calculateDamage();
+      _health = calculateHealth();
+      enemyColor = getRandomColor();
+    });
   }
 
   @override
@@ -67,7 +76,6 @@ class _ChallangeWidgetState extends State<ChallangeWidget> {
     return GestureDetector(
       onTap: () {
         _attack();
-        print("Health:$_health\nLevel:${levelCounter.value}");
         FocusScope.of(context).unfocus();
       },
       child: Container(
@@ -86,16 +94,13 @@ class _ChallangeWidgetState extends State<ChallangeWidget> {
                 child: Center(child: Text("$_health/${calculateHealth()}")),
               ),
               Container(width: 250, height: 250, color: enemyColor),
-              Container(
-                width: 250 * (expCounter.value / 10),
-                height: 25,
-                color: Colors.yellow.shade300,
-                child: Center(
-                  child: Text(
-                    "${expCounter.value.toString()}/10",
-                    style: TextStyle(color: AppColors.fourth),
-                  ),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Level: ${levelCounter.value}"),
+                  SizedBox(width: 30),
+                  Text("Attack: ${calculateDamage()}"),
+                ],
               ),
             ],
           ),
